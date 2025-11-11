@@ -1,16 +1,14 @@
-// src/components/DefenseMap.tsx
 import { Box } from "@mui/material";
 import MapComponent from "../components/MapComponent"; // ปรับ path ตามที่คุณเก็บจริง
 import { type DetectedObject } from "../types/detection";
 
 const DefenseMap = () => {
-  // ✅ ตัวอย่างข้อมูลที่จะแสดงบนแผนที่
   const sampleObjects: DetectedObject[] = [
     {
       obj_id: "def_001",
       type: "tank",
-      lat: 14.297400,
-      lng: 101.166150,
+      lat: 14.298526755889581,
+      lng: 101.16647852877576,
       objective: "our",
       size: "large",
     },
@@ -24,7 +22,7 @@ const DefenseMap = () => {
     },
     {
       obj_id: "def_003",
-      type: "soldier",
+      type: "drone",
       lat: 14.297520,
       lng: 101.166220,
       objective: "our",
@@ -45,8 +43,8 @@ const DefenseMap = () => {
     >
       <MapComponent
         objects={sampleObjects}
-        imagePath="/uploads/sample-defense.jpg"  // เปลี่ยน path ได้ตามจริง
-        cameraLocation="defense"                 // ✅ บอกว่าเป็นกล้องฝั่ง Defense
+        imagePath="/uploads/sample-defense.jpg"  // ✅ เปลี่ยน path ได้ตามจริง
+        cameraLocation="defense"                 // ✅ ระบุว่ากล้องฝั่ง Defense
       />
     </Box>
   );

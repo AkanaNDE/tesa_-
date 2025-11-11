@@ -3,18 +3,18 @@
  * คลิก marker เพื่อแสดงรายละเอียดใน popup
  */
 
-import { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import { Box, IconButton } from '@mui/material';
-import { Icon } from '@iconify/react';
-import { type DetectedObject } from '../types/detection';
-import DetectionPopup from './DetectionPopup';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import { Box, IconButton } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { type DetectedObject } from "../types/detection";
+import DetectionPopup from "./DetectionPopup";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 // โหลด Iconify สำหรับใช้ dynamic icons
-if (typeof window !== 'undefined') {
-  const script = document.createElement('script');
-  script.src = 'https://code.iconify.design/3/3.1.0/iconify.min.js';
+if (typeof window !== "undefined") {
+  const script = document.createElement("script");
+  script.src = "https://code.iconify.design/3/3.1.0/iconify.min.js";
   if (!document.querySelector('script[src*="iconify"]')) {
     document.head.appendChild(script);
   }
@@ -22,8 +22,8 @@ if (typeof window !== 'undefined') {
 
 // ตำแหน่งพื้นฐานของกล้อง 2 จุด
 const LOCATIONS = {
-  defence: { lng: 101.166279, lat: 14.297567 },
-  offence: { lng: 101.171298, lat: 14.286451 },
+  defense: { lng: 101.166279, lat: 14.297567 },
+  offense: { lng: 101.171298, lat: 14.286451 },
 };
 
 interface MapComponentProps {
@@ -32,33 +32,41 @@ interface MapComponentProps {
   cameraLocation?: string;
 }
 
-const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps) => {
+const MapComponent = ({
+  objects,
+  imagePath,
+  cameraLocation,
+}: MapComponentProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const selectedMarkerRef = useRef<HTMLDivElement | null>(null);
 
-  const [selectedObject, setSelectedObject] = useState<DetectedObject | null>(null);
+  const [selectedObject, setSelectedObject] = useState<DetectedObject | null>(
+    null
+  );
   const [cardPosition, setCardPosition] = useState<{ x: number; y: number } | null>(null);
 
   mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
   // หาจุดกึ่งกลางแผนที่ตาม camera location
   const getMapCenter = () => {
-    if (cameraLocation === 'defence') return [LOCATIONS.defence.lng, LOCATIONS.defence.lat];
-    if (cameraLocation === 'offence') return [LOCATIONS.offence.lng, LOCATIONS.offence.lat];
+    if (cameraLocation === "defense")
+      return [LOCATIONS.defense.lng, LOCATIONS.defense.lat];
+    if (cameraLocation === "offense")
+      return [LOCATIONS.offense.lng, LOCATIONS.offense.lat];
     return [101.166279, 14.297567];
   };
 
   // หา icon name ตามประเภทวัตถุ
   const getIconName = (type: string): string => {
     const iconMap: Record<string, string> = {
-      person: 'mdi:account',
-      car: 'mdi:car',
-      truck: 'mdi:truck',
-      bike: 'mdi:bike',
-      drone: 'healthicons:drone',
-      default: 'mdi:map-marker',
+      person: "mdi:account",
+      car: "mdi:car",
+      truck: "mdi:truck",
+      bike: "mdi:bike",
+      drone: "healthicons:drone",
+      default: "mdi:map-marker",
     };
     return iconMap[type.toLowerCase()] || iconMap.default;
   };
@@ -66,9 +74,21 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
   // สร้างสีจาก object ID (แต่ละ ID จะได้สีไม่ซ้ำกัน)
   const getColorForObjectId = (objectId: string): string => {
     const colors = [
-      '#FF5722', '#2196F3', '#4CAF50', '#FFC107', '#9C27B0',
-      '#00BCD4', '#E91E63', '#FF9800', '#009688', '#F44336',
-      '#3F51B5', '#8BC34A', '#FFEB3B', '#673AB7', '#00E676',
+      "#FF5722",
+      "#2196F3",
+      "#4CAF50",
+      "#FFC107",
+      "#9C27B0",
+      "#00BCD4",
+      "#E91E63",
+      "#FF9800",
+      "#009688",
+      "#F44336",
+      "#3F51B5",
+      "#8BC34A",
+      "#FFEB3B",
+      "#673AB7",
+      "#00E676",
     ];
 
     let hash = 0;
@@ -86,13 +106,13 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
     selectedMarkerRef.current = null;
   };
 
-  // สร้างแผนที่ (run ครั้งเดียวตอน mount)
+  // --- สร้างแผนที่ตอน mount ---
   useEffect(() => {
     if (!mapContainer.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: getMapCenter() as [number, number],
       zoom: 17,
     });
@@ -102,7 +122,7 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
     };
   }, []);
 
-  // อัพเดทจุดกึ่งกลางแผนที่เมื่อ camera location เปลี่ยน
+  // --- เปลี่ยน center เมื่อ cameraLocation เปลี่ยน ---
   useEffect(() => {
     if (map.current && cameraLocation) {
       map.current.flyTo({
@@ -113,11 +133,11 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
     }
   }, [cameraLocation]);
 
-  // สร้าง markers สำหรับวัตถุทั้งหมด
+  // --- สร้าง markers สำหรับทุก object ---
   useEffect(() => {
     if (!map.current) return;
 
-    // ลบ markers เก่าทั้งหมด
+    // ลบ marker เก่า
     markers.current.forEach((marker) => marker.remove());
     markers.current = [];
 
@@ -127,25 +147,16 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
       const color = getColorForObjectId(obj.obj_id);
       const iconName = getIconName(obj.type);
 
-      // สร้าง DOM element สำหรับ marker
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.style.cssText = `
-        position: relative;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      `;
+      // ✅ เพิ่มเงื่อนไขขยายวงกลมเฉพาะ def_001
+      const pulseSize = obj.obj_id === "def_001" ? 90 : 60;
 
       // วงกลม pulse animation
-      const pulseCircle = document.createElement('div');
-      pulseCircle.className = 'pulse-circle';
+      const pulseCircle = document.createElement("div");
+      pulseCircle.className = "pulse-circle";
       pulseCircle.style.cssText = `
         position: absolute;
-        width: 60px;
-        height: 60px;
+        width: ${pulseSize}px;
+        height: ${pulseSize}px;
         border-radius: 50%;
         background-color: ${color};
         opacity: 0.4;
@@ -156,9 +167,20 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
         pointer-events: none;
       `;
 
-      // container สำหรับ icon
-      const iconContainer = document.createElement('div');
-      iconContainer.className = 'iconify-marker';
+      // Container สำหรับ marker icon
+      const el = document.createElement("div");
+      el.className = "marker";
+      el.style.cssText = `
+        position: relative;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+
+      const iconContainer = document.createElement("div");
+      iconContainer.className = "iconify-marker";
       iconContainer.style.cssText = `
         cursor: pointer;
         position: relative;
@@ -173,22 +195,20 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
         border: 3px solid ${color};
       `;
 
-      // icon element
-      const iconElement = document.createElement('span');
-      iconElement.className = 'iconify';
-      iconElement.setAttribute('data-icon', iconName);
+      const iconElement = document.createElement("span");
+      iconElement.className = "iconify";
+      iconElement.setAttribute("data-icon", iconName);
       iconElement.style.cssText = `
         color: ${color};
         font-size: 24px;
       `;
 
-      // ประกอบ DOM elements เข้าด้วยกัน
       iconContainer.appendChild(iconElement);
       el.appendChild(pulseCircle);
       el.appendChild(iconContainer);
 
-      // เมื่อคลิก marker
-      el.addEventListener('click', (e) => {
+      // คลิก marker เพื่อแสดง popup
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
         setSelectedObject(obj);
         selectedMarkerRef.current = el;
@@ -200,8 +220,10 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
         });
       });
 
-      const lat = typeof obj.lat === 'number' ? obj.lat : parseFloat(obj.lat);
-      const lng = typeof obj.lng === 'number' ? obj.lng : parseFloat(obj.lng);
+      const lat =
+        typeof obj.lat === "number" ? obj.lat : parseFloat(obj.lat);
+      const lng =
+        typeof obj.lng === "number" ? obj.lng : parseFloat(obj.lng);
 
       const marker = new mapboxgl.Marker(el)
         .setLngLat([lng, lat])
@@ -211,7 +233,7 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
     });
   }, [objects, imagePath]);
 
-  // อัพเดทตำแหน่ง popup เมื่อแผนที่เลื่อนหรือ zoom
+  // --- อัพเดต popup card เมื่อ zoom/เลื่อน ---
   useEffect(() => {
     if (!map.current || !selectedMarkerRef.current) return;
 
@@ -225,18 +247,18 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
       }
     };
 
-    map.current.on('move', updateCardPosition);
-    map.current.on('zoom', updateCardPosition);
+    map.current.on("move", updateCardPosition);
+    map.current.on("zoom", updateCardPosition);
 
     return () => {
-      map.current?.off('move', updateCardPosition);
-      map.current?.off('zoom', updateCardPosition);
+      map.current?.off("move", updateCardPosition);
+      map.current?.off("zoom", updateCardPosition);
     };
   }, [selectedObject]);
 
   return (
-    <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
-      {/* CSS Animation สำหรับ pulse effect */}
+    <Box sx={{ position: "relative", height: "100%", width: "100%" }}>
+      {/* Pulse animation CSS */}
       <style>
         {`
           @keyframes pulse {
@@ -256,41 +278,40 @@ const MapComponent = ({ objects, imagePath, cameraLocation }: MapComponentProps)
         `}
       </style>
 
-      {/* Container ของแผนที่ */}
+      {/* แผนที่ */}
       <Box
         ref={mapContainer}
         sx={{
-          height: '100%',
-          width: '100%',
+          height: "100%",
+          width: "100%",
           borderRadius: 1,
-          overflow: 'hidden',
+          overflow: "hidden",
         }}
       />
 
-      {/* Detection Popup */}
+      {/* Popup แสดงรายละเอียด */}
       {selectedObject && cardPosition && (
         <Box
           sx={{
-            position: 'fixed',
+            position: "fixed",
             left: cardPosition.x,
             top: cardPosition.y,
-            transform: 'translate(-50%, -100%)',
+            transform: "translate(-50%, -100%)",
             zIndex: 9999,
             mb: 1,
           }}
         >
-          {/* ปุ่มปิด popup */}
           <IconButton
             onClick={handleClose}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               top: 8,
               right: 8,
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              color: 'white',
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              color: "white",
               zIndex: 1,
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
               },
             }}
           >

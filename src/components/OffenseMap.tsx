@@ -7,12 +7,12 @@ import { type DetectedObject } from "../types/detection";
 const OffenseMap = () => {
   const sampleObjects: DetectedObject[] = [
     {
-      obj_id: "obj_001",
-      type: "drone",
-      lat: 14.297567,
-      lng: 101.166279,
-      objective: "unknown",
-      size: "medium",
+      obj_id: "def_001",
+      type: "tank",
+      lat: 14.298526755889581,
+      lng: 101.16647852877576,
+      objective: "our",
+      size: "large",
     },
     {
       obj_id: "obj_002",
