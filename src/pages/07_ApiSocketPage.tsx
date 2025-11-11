@@ -140,7 +140,7 @@ useEffect(() => {
         </Box>
 
         <Alert severity="success" sx={{ mt: 2 }}>
-          ✅ <strong>ผลลัพธ์:</strong> ได้ข้อมูลครบทั้งย้อนหลังและ real-time ในหน้าเดียว!
+           <strong>ผลลัพธ์:</strong> ได้ข้อมูลครบทั้งย้อนหลังและ real-time ในหน้าเดียว!
         </Alert>
       </Paper>
 
