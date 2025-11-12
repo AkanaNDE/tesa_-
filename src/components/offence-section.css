@@ -17,7 +17,7 @@
 /* ===== Name Offence ===== */
 .name-offence {
   flex: 0.5; /* ✅ เดิม 10% → ใช้ flex 0.5 เพื่อให้สัดส่วนปรับง่าย */
-  background-color: #ffcccc;
+  background-color: #b40000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +28,7 @@
 
 /* ===== Status ===== */
 .status {
-  flex: 2; /* ✅ แทน 30% */
+  flex: 3; /* ✅ แทน 30% */
   background-color: #ffb3b3;
   display: flex;
   align-items: center;
@@ -68,8 +68,19 @@
 }
 
 /* ===== Offence History ===== */
+.History-offence {
+  flex: 0.5; /* ✅ เดิม 10% → ใช้ flex 0.5 เพื่อให้สัดส่วนปรับง่าย */
+  background-color: #b40000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-bottom: 2px solid #ff9999;
+  overflow: hidden;
+}
+
 .offence-history {
-  flex: 6; /* ✅ เหลือสัดส่วนมากสุด */
+  flex: 5; /* ✅ เหลือสัดส่วนมากสุด */
   background-color: #ff9999;
   box-sizing: border-box;
   padding: 10px 12px;
