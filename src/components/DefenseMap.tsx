@@ -1,34 +1,47 @@
+// src/components/DefenseMap.tsx
 import { Box } from "@mui/material";
-import MapComponent from "../components/MapComponent"; // ปรับ path ตามที่คุณเก็บจริง
-import { type DetectedObject } from "../types/detection";
+import MapComponent from "../components/MapComponent";
+import type { DefenseEvent, ImportantLocation } from "../App";
+import type { DetectedObject } from "../types/detection";
 
-const DefenseMap = () => {
-  const sampleObjects: DetectedObject[] = [
-    {
-      obj_id: "def_001",
-      type: "tank",
-      lat: 14.298526755889581,
-      lng: 101.16647852877576,
-      objective: "our",
-      size: "large",
-    },
-    {
-      obj_id: "def_002",
-      type: "drone",
-      lat: 14.297580,
-      lng: 101.166310,
-      objective: "enemy",
-      size: "medium",
-    },
-    {
-      obj_id: "def_003",
-      type: "drone",
-      lat: 14.297520,
-      lng: 101.166220,
-      objective: "our",
-      size: "small",
-    },
-  ];
+type Props = {
+  defenseEvents: DefenseEvent[];
+  importantLocation: ImportantLocation;
+};
+
+const DefenseMap: React.FC<Props> = ({ defenseEvents, importantLocation }) => {
+  // ✅ 1) ปักหมุด Center (type: tank) จาก ImportantLocation
+  const centerMarker: DetectedObject = {
+    obj_id: "Center", // ✅ เปลี่ยนชื่อจาก def_000 เป็น Center
+    type: "tank",
+    lat: importantLocation.lat,
+    lng: importantLocation.lng,
+    size: "large",
+    radius: 30, // ✅ ใหญ่กว่า 3 เท่า
+  };
+
+  // ✅ 2) เลือกข้อมูลล่าสุดของแต่ละ objId (id ไม่ซ้ำ)
+  const seen = new Set<string>();
+  const latestPerId: DefenseEvent[] = [];
+  for (const ev of defenseEvents) {
+    if (!seen.has(ev.objId)) {
+      seen.add(ev.objId);
+      latestPerId.push(ev);
+    }
+  }
+
+  // ✅ 3) แปลงเป็น DetectedObject[]
+  const droneMarkers: DetectedObject[] = latestPerId.map((ev) => ({
+    obj_id: `def_${ev.objId.padStart(3, "0")}`,
+    type: ev.type,        // "drone"
+    lat: ev.lat,
+    lng: ev.lng,
+    objective: "drone",
+    radius: 10, // ✅ ขนาดวงโครจรของโดรนทั่วไป
+  }));
+
+  // ✅ 4) รวมทั้งหมด (Center + Drones)
+  const objects: DetectedObject[] = [centerMarker, ...droneMarkers];
 
   return (
     <Box
@@ -42,9 +55,9 @@ const DefenseMap = () => {
       }}
     >
       <MapComponent
-        objects={sampleObjects}
-        imagePath="/uploads/sample-defense.jpg"  // ✅ เปลี่ยน path ได้ตามจริง
-        cameraLocation="defense"                 // ✅ ระบุว่ากล้องฝั่ง Defense
+        objects={objects}
+        imagePath="/uploads/sample-defense.jpg"
+        cameraLocation="defense"
       />
     </Box>
   );

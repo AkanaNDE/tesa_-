@@ -20,7 +20,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-// ตำแหน่งพื้นฐานของกล้อง 2 จุด
+// จุดกล้องเริ่มต้นสองฝั่ง
 const LOCATIONS = {
   defense: { lng: 101.166279, lat: 14.297567 },
   offense: { lng: 101.171298, lat: 14.286451 },
@@ -42,62 +42,32 @@ const MapComponent = ({
   const markers = useRef<mapboxgl.Marker[]>([]);
   const selectedMarkerRef = useRef<HTMLDivElement | null>(null);
 
-  const [selectedObject, setSelectedObject] = useState<DetectedObject | null>(
-    null
-  );
+  const [selectedObject, setSelectedObject] = useState<DetectedObject | null>(null);
   const [cardPosition, setCardPosition] = useState<{ x: number; y: number } | null>(null);
 
   mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-  // หาจุดกึ่งกลางแผนที่ตาม camera location
+  // หาจุดศูนย์กลางแผนที่
   const getMapCenter = () => {
-    if (cameraLocation === "defense")
-      return [LOCATIONS.defense.lng, LOCATIONS.defense.lat];
-    if (cameraLocation === "offense")
-      return [LOCATIONS.offense.lng, LOCATIONS.offense.lat];
+    if (cameraLocation === "defense") return [LOCATIONS.defense.lng, LOCATIONS.defense.lat];
+    if (cameraLocation === "offense") return [LOCATIONS.offense.lng, LOCATIONS.offense.lat];
     return [101.166279, 14.297567];
   };
 
-  // หา icon name ตามประเภทวัตถุ
+  // ✅ ฟังก์ชันเลือก icon ตามประเภท
   const getIconName = (type: string): string => {
-    const iconMap: Record<string, string> = {
-      person: "mdi:account",
-      car: "mdi:car",
-      truck: "mdi:truck",
-      bike: "mdi:bike",
-      drone: "healthicons:drone",
-      default: "mdi:map-marker",
-    };
-    return iconMap[type.toLowerCase()] || iconMap.default;
+    const lower = type.toLowerCase();
+    if (lower === "tank") return "mdi:map-marker"; // 🟢 ใช้หมุดแทน
+    if (lower === "drone") return "healthicons:drone"; // 🔴 ใช้โดรนเหมือนเดิม
+    return "mdi:map-marker";
   };
 
-  // สร้างสีจาก object ID (แต่ละ ID จะได้สีไม่ซ้ำกัน)
-  const getColorForObjectId = (objectId: string): string => {
-    const colors = [
-      "#FF5722",
-      "#2196F3",
-      "#4CAF50",
-      "#FFC107",
-      "#9C27B0",
-      "#00BCD4",
-      "#E91E63",
-      "#FF9800",
-      "#009688",
-      "#F44336",
-      "#3F51B5",
-      "#8BC34A",
-      "#FFEB3B",
-      "#673AB7",
-      "#00E676",
-    ];
-
-    let hash = 0;
-    for (let i = 0; i < objectId.length; i++) {
-      hash = objectId.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
+  // ✅ กำหนดสีประจำประเภท
+  const getColorForType = (type: string): string => {
+    const lower = type.toLowerCase();
+    if (lower === "tank") return "#2e7d32";  // เขียว
+    if (lower === "drone") return "#f44336"; // แดง
+    return "#2196f3";
   };
 
   const handleClose = () => {
@@ -106,23 +76,19 @@ const MapComponent = ({
     selectedMarkerRef.current = null;
   };
 
-  // --- สร้างแผนที่ตอน mount ---
+  // --- สร้างแผนที่ ---
   useEffect(() => {
     if (!mapContainer.current) return;
-
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: getMapCenter() as [number, number],
       zoom: 17,
     });
-
-    return () => {
-      map.current?.remove();
-    };
+    return () => map.current?.remove();
   }, []);
 
-  // --- เปลี่ยน center เมื่อ cameraLocation เปลี่ยน ---
+  // --- เปลี่ยนมุมมองเมื่อ cameraLocation เปลี่ยน ---
   useEffect(() => {
     if (map.current && cameraLocation) {
       map.current.flyTo({
@@ -133,30 +99,29 @@ const MapComponent = ({
     }
   }, [cameraLocation]);
 
-  // --- สร้าง markers สำหรับทุก object ---
+  // --- วาด markers ---
   useEffect(() => {
     if (!map.current) return;
 
-    // ลบ marker เก่า
-    markers.current.forEach((marker) => marker.remove());
+    // ลบของเก่า
+    markers.current.forEach((m) => m.remove());
     markers.current = [];
 
     if (objects.length === 0) return;
 
     objects.forEach((obj) => {
-      const color = getColorForObjectId(obj.obj_id);
+      const color = getColorForType(obj.type);
       const iconName = getIconName(obj.type);
 
-      // ✅ เพิ่มเงื่อนไขขยายวงกลมเฉพาะ def_001
-      const pulseSize = obj.obj_id === "def_001" ? 90 : 60;
+      // ✅ radius (center ใหญ่กว่า)
+      const pulseRadius = obj.radius ?? (obj.type.toLowerCase() === "tank" ? 30 : 10);
 
-      // วงกลม pulse animation
+      // สร้างวง pulse รอบ marker
       const pulseCircle = document.createElement("div");
-      pulseCircle.className = "pulse-circle";
       pulseCircle.style.cssText = `
         position: absolute;
-        width: ${pulseSize}px;
-        height: ${pulseSize}px;
+        width: ${pulseRadius * 2}px;
+        height: ${pulseRadius * 2}px;
         border-radius: 50%;
         background-color: ${color};
         opacity: 0.4;
@@ -167,9 +132,8 @@ const MapComponent = ({
         pointer-events: none;
       `;
 
-      // Container สำหรับ marker icon
+      // marker container
       const el = document.createElement("div");
-      el.className = "marker";
       el.style.cssText = `
         position: relative;
         width: 40px;
@@ -180,19 +144,17 @@ const MapComponent = ({
       `;
 
       const iconContainer = document.createElement("div");
-      iconContainer.className = "iconify-marker";
       iconContainer.style.cssText = `
         cursor: pointer;
-        position: relative;
         width: 40px;
         height: 40px;
+        background: white;
+        border-radius: 50%;
+        border: 3px solid ${color};
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: white;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        border: 3px solid ${color};
       `;
 
       const iconElement = document.createElement("span");
@@ -200,19 +162,18 @@ const MapComponent = ({
       iconElement.setAttribute("data-icon", iconName);
       iconElement.style.cssText = `
         color: ${color};
-        font-size: 24px;
+        font-size: 26px;
       `;
 
       iconContainer.appendChild(iconElement);
       el.appendChild(pulseCircle);
       el.appendChild(iconContainer);
 
-      // คลิก marker เพื่อแสดง popup
+      // คลิก marker
       el.addEventListener("click", (e) => {
         e.stopPropagation();
         setSelectedObject(obj);
         selectedMarkerRef.current = el;
-
         const rect = el.getBoundingClientRect();
         setCardPosition({
           x: rect.left + rect.width / 2,
@@ -220,23 +181,16 @@ const MapComponent = ({
         });
       });
 
-      const lat =
-        typeof obj.lat === "number" ? obj.lat : parseFloat(obj.lat);
-      const lng =
-        typeof obj.lng === "number" ? obj.lng : parseFloat(obj.lng);
-
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([lng, lat])
-        .addTo(map.current!);
-
+      const lat = Number(obj.lat);
+      const lng = Number(obj.lng);
+      const marker = new mapboxgl.Marker(el).setLngLat([lng, lat]).addTo(map.current!);
       markers.current.push(marker);
     });
   }, [objects, imagePath]);
 
-  // --- อัพเดต popup card เมื่อ zoom/เลื่อน ---
+  // --- อัปเดต popup card ---
   useEffect(() => {
     if (!map.current || !selectedMarkerRef.current) return;
-
     const updateCardPosition = () => {
       if (selectedMarkerRef.current) {
         const rect = selectedMarkerRef.current.getBoundingClientRect();
@@ -246,10 +200,8 @@ const MapComponent = ({
         });
       }
     };
-
     map.current.on("move", updateCardPosition);
     map.current.on("zoom", updateCardPosition);
-
     return () => {
       map.current?.off("move", updateCardPosition);
       map.current?.off("zoom", updateCardPosition);
@@ -262,18 +214,9 @@ const MapComponent = ({
       <style>
         {`
           @keyframes pulse {
-            0% {
-              transform: translate(-50%, -50%) scale(0.5);
-              opacity: 0.8;
-            }
-            50% {
-              transform: translate(-50%, -50%) scale(1.2);
-              opacity: 0.4;
-            }
-            100% {
-              transform: translate(-50%, -50%) scale(1.8);
-              opacity: 0;
-            }
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
           }
         `}
       </style>
@@ -289,7 +232,7 @@ const MapComponent = ({
         }}
       />
 
-      {/* Popup แสดงรายละเอียด */}
+      {/* Popup รายละเอียด */}
       {selectedObject && cardPosition && (
         <Box
           sx={{
@@ -310,9 +253,7 @@ const MapComponent = ({
               backgroundColor: "rgba(0, 0, 0, 0.6)",
               color: "white",
               zIndex: 1,
-              "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.8)",
-              },
+              "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.8)" },
             }}
           >
             <Icon icon="mdi:close" width={16} />

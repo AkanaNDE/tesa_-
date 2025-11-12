@@ -1,40 +1,84 @@
-// src/components/DefenseSection.tsx
-import React from "react";
+import React, { useState } from "react";
 import "./defence-section.css";
-import type { DefenseEvent } from "../App";
+import type { DefenseEvent, ImportantLocation } from "../App";
 
 type Props = {
   events: DefenseEvent[];
   setEvents: React.Dispatch<React.SetStateAction<DefenseEvent[]>>;
+  importantLocation: ImportantLocation;
+  setImportantLocation: React.Dispatch<React.SetStateAction<ImportantLocation>>;
 };
 
 const FALLBACK_IMG =
   "https://cdn-icons-png.flaticon.com/512/2920/2920233.png";
 
-const DefenseSection: React.FC<Props> = ({ events }) => {
-  // ✅ ดึงภาพตัวบนสุด
-  const latestImage = events.length > 0 ? events[0].image || FALLBACK_IMG : FALLBACK_IMG;
+const DEFAULT_IMPORTANT_LOCATION = { lat: 14.298527, lng: 101.166479 };
+
+const DefenseSection: React.FC<Props> = ({
+  events,
+  importantLocation,
+  setImportantLocation,
+}) => {
+  const latestImage =
+    events.length > 0 ? events[0].image || FALLBACK_IMG : FALLBACK_IMG;
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [latInput, setLatInput] = useState(String(importantLocation.lat));
+  const [lngInput, setLngInput] = useState(String(importantLocation.lng));
+
+  const handleSave = () => {
+    const newLat = parseFloat(latInput) || DEFAULT_IMPORTANT_LOCATION.lat;
+    const newLng = parseFloat(lngInput) || DEFAULT_IMPORTANT_LOCATION.lng;
+    setImportantLocation({ lat: newLat, lng: newLng });
+    setShowSettings(false);
+  };
 
   return (
     <section className="defence-section">
-      <div className="name-defence">Defence</div>
+      {/* ===== Name Bar ===== */}
+      <div className="name-defence">
+        <span>Defence</span>
 
+        {/* ✅ ปุ่มตั้งค่า (ขวาสุด) */}
+        <button
+          className="gear-btn top-right"
+          onClick={() => setShowSettings(!showSettings)}
+          title="Set Important Location"
+        >
+          ⚙️
+        </button>
+      </div>
+
+      {/* ✅ แผงกรอกค่า lat/lng */}
+      {showSettings && (
+        <div className="settings-panel">
+          <p><strong>Set Important Location</strong></p>
+          <div className="settings-row">
+            <label>
+              Lat: <input value={latInput} onChange={(e) => setLatInput(e.target.value)} />
+            </label>
+            <label>
+              Lng: <input value={lngInput} onChange={(e) => setLngInput(e.target.value)} />
+            </label>
+            <button onClick={handleSave}>Save</button>
+          </div>
+        </div>
+      )}
+
+      {/* ===== Status Drone ===== */}
       <div className="status-drone">
         <div className="drone-image">
           <img src={FALLBACK_IMG} alt="Drone" />
         </div>
         <div className="drone-info">
-          <p><strong>obj-id:</strong> 001</p>
-          <p><strong>type:</strong> drone</p>
-          <p><strong>lat:</strong> 14.297600</p>
-          <p><strong>lng:</strong> 101.166300</p>
-          <p><strong>timestamp:</strong> 15:06:08</p>
+          <p><strong>Important Point:</strong></p>
+          <p><strong>lat:</strong> {importantLocation.lat.toFixed(6)}</p>
+          <p><strong>lng:</strong> {importantLocation.lng.toFixed(6)}</p>
         </div>
       </div>
 
       <div className="video-real">Video - Real</div>
 
-      {/* ✅ ส่วนนี้เปลี่ยนเป็นแสดงรูปบนสุด */}
       <div className="img-real">
         <img src={latestImage} alt="Latest Drone" className="real-image" />
       </div>

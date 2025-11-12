@@ -1,16 +1,14 @@
-/**
- * Types สำหรับข้อมูลการตรวจจับวัตถุ
- */
+// src/types/detection.ts
+export type DetectedObject = {
+  obj_id: string;
+  type: "drone" | "tank" | "vehicle" | "center" |  string;
+  lat: number;
+  lng: number;
+  objective?: "drone" | "our" | "center" | string;
+  size?: "small" | "medium" | "large" | string;
+  radius?: number; // ✅ เพิ่ม radius สำหรับการแสดงผล
+};
 
-// วัตถุที่ตรวจพบแต่ละชิ้น
-export interface DetectedObject {
-  obj_id: string;      // รหัสประจำตัววัตถุ เช่น "obj_001"
-  type: string;        // ประเภทวัตถุ เช่น "drone", "person", "car"
-  lat: number;         // พิกัด Latitude
-  lng: number;         // พิกัด Longitude
-  objective: string;   // วัตถุประสงค์ เช่น "unknown", "our", "enemy"
-  size: string;        // ขนาดวัตถุ เช่น "small", "medium", "large"
-}
 
 // ข้อมูลกล้อง
 export interface Camera {

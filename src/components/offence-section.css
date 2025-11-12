@@ -1,42 +1,121 @@
-/* โครงหลักของ section ฝั่ง Offense */
+/* ===============================
+   Offense Section Layout
+   flex-based (ปรับง่ายแบบ Defence)
+   =============================== */
+
 .offense-section {
   display: flex;
-  flex-direction: column; /* ✅ เรียงแนวตั้ง */
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: #ffe5e5; /* สีพื้นอ่อนเพื่อแยกฝั่ง */
+  background-color: #ffe5e5;
   border-right: 4px solid red;
   box-sizing: border-box;
+  min-height: 0;
 }
 
-/* ===== ส่วนบน 10% ===== */
+/* ===== Name Offence ===== */
 .name-offence {
-  flex: 1; /* สัดส่วน 1 จากทั้งหมด 10 */
+  flex: 0.5; /* ✅ เดิม 10% → ใช้ flex 0.5 เพื่อให้สัดส่วนปรับง่าย */
   background-color: #ffcccc;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   border-bottom: 2px solid #ff9999;
+  overflow: hidden;
 }
 
-/* ===== ส่วนกลาง 30% ===== */
+/* ===== Status ===== */
 .status {
-  flex: 3; /* สัดส่วน 3 จากทั้งหมด 10 */
+  flex: 2; /* ✅ แทน 30% */
   background-color: #ffb3b3;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
   border-bottom: 2px solid #ff8080;
+  overflow: hidden;
+  padding: 10px 14px;
+  box-sizing: border-box;
 }
 
-/* ===== ส่วนล่าง 60% ===== */
-.offence-history {
-  flex: 6; /* สัดส่วน 6 จากทั้งหมด 10 */
-  background-color: #ff9999;
+.status-box-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #fff2f2;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  width: 100%;
+  max-width: 90%;
+  box-sizing: border-box;
+  color: #7a1f1f;
+}
+
+.offence-image-top {
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+}
+.offence-image-top img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ===== Offence History ===== */
+.offence-history {
+  flex: 6; /* ✅ เหลือสัดส่วนมากสุด */
+  background-color: #ff9999;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  overflow-y: auto;
+}
+
+/* ===== List & Card ===== */
+.offence-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.offence-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff2f2;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  color: #7a1f1f;
+}
+
+.offence-image {
+  flex: 0 0 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.offence-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ===== Text Info ===== */
+.offence-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+  font-size: 0.95rem;
+}
+.offence-info p {
+  margin: 2px 0;
 }
