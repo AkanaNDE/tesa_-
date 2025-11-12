@@ -83,7 +83,7 @@ const DefenseSection: React.FC<Props> = ({
         <img src={latestImage} alt="Latest Drone" className="real-image" />
       </div>
 
-      <div className="name-defence">
+      <div className="History-defence">
         <span>Defence History</span>
       </div>
       

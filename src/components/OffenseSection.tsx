@@ -57,9 +57,6 @@ const OffenseSection: React.FC<Props> = ({ events }) => {
         <div className="offence-list">
           {events.map((ev) => (
             <article className="offence-card" key={ev.id}>
-              <div className="offence-image">
-                <img src={DRONE_IMG} alt="Drone" />
-              </div>
               <div className="offence-info">
                 <p>
                   lat: {ev.lat.toFixed(6)} &nbsp;&nbsp; lng: {ev.lng.toFixed(6)}
