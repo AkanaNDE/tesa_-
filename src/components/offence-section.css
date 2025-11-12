@@ -1,0 +1,42 @@
+/* โครงหลักของ section ฝั่ง Offense */
+.offense-section {
+  display: flex;
+  flex-direction: column; /* ✅ เรียงแนวตั้ง */
+  width: 100%;
+  height: 100%;
+  background-color: #ffe5e5; /* สีพื้นอ่อนเพื่อแยกฝั่ง */
+  border-right: 4px solid red;
+  box-sizing: border-box;
+}
+
+/* ===== ส่วนบน 10% ===== */
+.name-offence {
+  flex: 1; /* สัดส่วน 1 จากทั้งหมด 10 */
+  background-color: #ffcccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-bottom: 2px solid #ff9999;
+}
+
+/* ===== ส่วนกลาง 30% ===== */
+.status {
+  flex: 3; /* สัดส่วน 3 จากทั้งหมด 10 */
+  background-color: #ffb3b3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-bottom: 2px solid #ff8080;
+}
+
+/* ===== ส่วนล่าง 60% ===== */
+.offence-history {
+  flex: 6; /* สัดส่วน 6 จากทั้งหมด 10 */
+  background-color: #ff9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}

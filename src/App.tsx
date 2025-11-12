@@ -1,53 +1,123 @@
-/**
- * Component หลักของแอพพลิเคชั่น
- * จัดการ routing, theme, และ React Query
- */
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// src/App.tsx
+import React, { useState } from "react";
 import HomePage from "./pages/HomePage";
-import OffensePage from "./pages/OffensePage";
-import DefensePage from "./pages/DefensePage";  // ✅ เพิ่ม import
-import MuiGridPage from "./pages/02_MuiGridPage";
 
-// สร้าง Material-UI theme
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#1976d2",
-    },
-    secondary: {
-      main: "#dc004e",
-    },
-  },
-});
-
-// สร้าง Query Client สำหรับ React Query
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+export type DefenseEvent = {
+  id: number;
+  objId: string;
+  type: string;
+  lat: number;
+  lng: number;
+  timestamp: string;
+  image?: string; // ✅ รูป
+};
 
 function App() {
+  const [defenseEvents, setDefenseEvents] = useState<DefenseEvent[]>([
+
+    {
+      id: 4,
+      objId: "004",
+      type: "drone",
+      lat: 14.297220,
+      lng: 101.167100,
+      timestamp: "15:09:44",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 1,
+      objId: "001",
+      type: "drone",
+      lat: 14.2976,
+      lng: 101.1663,
+      timestamp: "15:06:08",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 2,
+      objId: "002",
+      type: "drone",
+      lat: 14.29812,
+      lng: 101.16598,
+      timestamp: "15:07:12",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920249.png",
+    },
+    {
+      id: 2,
+      objId: "002",
+      type: "drone",
+      lat: 14.298120,
+      lng: 101.165980,
+      timestamp: "15:07:12",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 3,
+      objId: "003",
+      type: "drone",
+      lat: 14.296950,
+      lng: 101.166750,
+      timestamp: "15:08:21",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 4,
+      objId: "004",
+      type: "drone",
+      lat: 14.297220,
+      lng: 101.167100,
+      timestamp: "15:09:44",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 5,
+      objId: "005",
+      type: "drone",
+      lat: 14.297880,
+      lng: 101.166010,
+      timestamp: "15:10:03",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 2,
+      objId: "002",
+      type: "drone",
+      lat: 14.298120,
+      lng: 101.165980,
+      timestamp: "15:07:12",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 3,
+      objId: "003",
+      type: "drone",
+      lat: 14.296950,
+      lng: 101.166750,
+      timestamp: "15:08:21",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 4,
+      objId: "004",
+      type: "drone",
+      lat: 14.297220,
+      lng: 101.167100,
+      timestamp: "15:09:44",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+    {
+      id: 5,
+      objId: "005",
+      type: "drone",
+      lat: 14.297880,
+      lng: 101.166010,
+      timestamp: "15:10:03",
+      image: "https://cdn-icons-png.flaticon.com/512/2920/2920233.png",
+    },
+  ]);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/offense-page" element={<OffensePage />} />
-            <Route path="/defense-page" element={<DefensePage />} /> 
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <HomePage defenseEvents={defenseEvents} setDefenseEvents={setDefenseEvents} />
   );
 }
 

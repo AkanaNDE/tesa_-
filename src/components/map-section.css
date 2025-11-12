@@ -1,0 +1,33 @@
+/* ===== โครงหลักของ Map Section ===== */
+.map-section {
+  display: flex;
+  flex-direction: row; /* ✅ เรียงแนวนอน */
+  width: 100%;
+  height: 100%;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+/* ===== ฝั่งซ้าย Offense Map (50%) ===== */
+.offense-map {
+  flex: 1; /* แบ่งครึ่ง */
+  background-color: #ffebeb; /* โทนแดงอ่อน */
+  border-right: 3px solid #f44336; /* ขอบแดง */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #b71c1c;
+}
+
+/* ===== ฝั่งขวา Defense Map (50%) ===== */
+.defense-map {
+  flex: 1;
+  background-color: #e3f2fd; /* โทนฟ้าอ่อน */
+  border-left: 3px solid #2196f3; /* ขอบฟ้า */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #0d47a1;
+}
